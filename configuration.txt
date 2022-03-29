@@ -1,0 +1,150 @@
+@La commande usermod modifie les fichiers d'administration des comptes du système
+@verifier qui est dans le groupe sudo
+getent group sudo
+
+@su signifie Substitute User ou Switch User. Elle permet d’endosser l’identité d’un autre utilisateur sans se déconnecter
+
+@Installing wget (wget is a free and open source tool for downloading files from web repositories.)
+
+@Installing Oh my zsh
+$ sudo apt-get install zsh
+$ zsh --version
+$ sh -c "$(wget https://raw.github.com/robbyrussell/oh-my-zsh/master/tools/install.sh -O -)"
+
+@Installing SSH and configuring SSH service
+$ sudo apt-get update
+$ sudo apt install openssh-server
+
+@Le serveur OpenSSH, sshd, attend en permanence des connexions depuis des clients. Quand une requête de connexion a lieu, sshd établit la connexion correcte en fonction du type de client. Par exemple, si un client se connecte avec le client ssh, le serveur OpenSSH va établir une connexion sécurisée après une authentification. Si un client se connecte avec scp, le serveur OpenSSH va commencer un transfert de fichier sécurisé entre le serveur et le client après une authentification. OpenSSH peut utiliser de nombreuses méthodes d'authentification, par exemple un mot de passe, une clé publique, ou un ticket Kerberos.
+
+$ sudo apt-get update
+$ sudo apt install openssl-server
+@Check serveur status
+sudo systemctl status ssh
+@restart the ssh service
+$ service ssh restart
+@Changing default port (22) to 4242
+$ sudo nano /etc/ssh/sshd_config
+@Check if port settings got right
+$ sudo grep Port /etc/ssh/sshd_config
+@Restart the SSH service
+$ sudo service ssh restart
+
+@Install UFW
+$ apt-get install ufw
+@Enable
+$ sudo ufw enable
+@Check the status
+$ sudo ufw status numbered
+
+@Configure the rules
+$ sudo ufw allow ssh
+@Configure the port rules
+$ sudo ufw allow 4242
+@@@@@@@@@@@@Delete the new rule: (This is for when you defend your Born2beroot)
+$ sudo ufw status numbered
+$ sudo ufw delete (that number, for example 5 or 6)
+
+@2.5. Connecting SSH server
+Add forward rule for VirtualBox
+1Go to VirtualBox-> Choose the VM->Select Settings
+2. Choose “Network”-> “Adapter 1"->”Advanced”->”Port Forwarding”
+
+@ Restart SSH server (go to the your VM machine)
+$ sudo systemctl restart ssh
+@ Check ssh status:
+$ sudo service sshd status
+@ From host side from iTerm2 or Terminal enter as shown below:
+$ ssh your_username@127.0.0.1 -p 4242
+@ Quit the connection:
+$ exit
+
+@Installing password quality checking library (libpam-pwquality):
+$ sudo apt-get install libpam-pwquality
+@Change the length
+$ sudo nano /etc/pam.d/common-password
+@Find the following line:
+password [success=2 default=ignore] pam_unix.so obscure sha512
+And add an extra word: minlen=10 at the end.
+password [success=2 default=ignore] pam_unix.so obscure sha512 minlen=10
+
+@Find this line:
+password    requisite         pam_pwquality.so retry=3
+
+Add these values (min lower-case 1 letter, min upper-case 1 letter, min digit 1, max same letter repetition 3, whether to check if the password contains the user name in some form (enabled if the value is not 0), the minimum number of characters that must be different from the old password=7, enforce_for_root: same policy for root users):
+password    requisite         pam_pwquality.so retry=3 lcredit =-1 ucredit=-1 dcredit=-1 maxrepeat=3 usercheck=0 difok=7 enforce_for_root
+
+
+
+@Password expiration:
+$ sudo nano /etc/login.defs
+@Password expiration:
+$ sudo nano /etc/login.defs
+@Find this part
+PASS_MAX_DAYS 9999
+PASS_MIN_DAYS 0
+PASS_WARN_AGE 7
+@Change it like this:(max 30 days, min number of days(2) allowed before the @modification, receive a notification before expiration at least 7 days before)
+PASS_MAX_DAYS 30
+PASS_MIN_DAYS 2
+PASS_WARN_AGE 7
+@Reboot the change affects:
+$ sudo reboot
+
+@ Create group
+$ sudo groupadd user42
+$ sudo groupadd evaluating
+@Check if group created:
+$ getent group
+@. Create user and assign into group
+Check the all local users:
+$ cut -d: -f1 /etc/passwd
+@Create the user
+$ sudo adduser new_username
+
+@Assign an user into “evaluating” group (This is for when you defend)
+$ sudo usermod -aG user42 your_username
+$ sudo usermod -aG evaluating your_new_username
+@Check if the user is in group
+$ getent group user42
+$ getent group evaluating
+
+@Check which groups user account belongs:
+$ groups
+@Check if password rules working in users:
+$ sudo chage -l your_new_username
+
+@Pour la defense changer le host name
+@Check current hostname
+$ hostnamectl
+@Change the hostname
+$ hostnamectl set-hostname new_hostname
+@Change /etc/hosts file
+$ sudo nano /etc/hosts
+@Change old_hostname with new_hostname:
+127.0.0.1       localhost
+127.0.0.1       new_hostname
+@Reboot and check the change
+$ sudo reboot
+
+@Crontab configuration
+@Install the netstat tools
+$ sudo apt-get update -y
+$ sudo apt-get install -y net-tools
+
+@Place monitoring.sh in /usr/local/bin/
+@Add the rule that script would execute without sudo password:
+Open sudoers file:
+$ sudo visudo
+
+@Add this line:
+your_username ALL=(ALL) NOPASSWD: /usr/local/bin/monitoring.sh
+
+ @Reboot
+$ sudo reboot
+ @Execute the script as su:
+$ sudo /usr/local/bin/monitoring.sh
+@ Open crontab and add the rule:
+$ sudo crontab -u root -e
+@Add at end as follows: (*/10 means every 10 mins the script will show)
+*/10 * * * * /usr/local/bin/monitoring.sh
