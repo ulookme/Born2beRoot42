@@ -1,0 +1,13 @@
+# Born2beRoot42
+
+Ce projet consiste à vous faire mettre en place votre premier serveur en suivant des règles spécifiques.
+
+Vous devez utiliser comme système d’exploitation, au choix : Debian latest stable (pas de testing/unstable), ou CentOS latest stable.
+
+L’utilisation de Debian est fortement conseillée pour quelqu’un débutant dans ce domaine.Vous devez créer au minimum 2 partitions chiffrées en utilisant LVM. Voici un exemple de partition attendue pour votre machine virtuelle :Un service SSH sera actif sur le port 4242 uniquement.
+
+Pour des questions de sécurité, on ne devra pas pouvoir se connecter par SSH avec l’utilisateur root.Vous allez configurer votre système d’exploitation avec le pare-feu UFW et ainsi ne laisser ouvert que le port 4242.•
+
+Votre machine aura pour hostname votre login suivi de 42 (exemple : wil42). Vous serez amené(e) à modifier ce hostname durant votre évaluation. • Vous allez mettre en place une politique de mot de passe fort.
+
+• Vous allez installer et configurer sudo selon une pratique stricte. • Un utilisateur sera présent avec pour nom votre login en plus de l’utilisateur root. • Cet utilisateur appartiendra aux groupes user42 et sudo.Pour mettre en place une politique de mot de passe fort, il faudra remplir les conditions suivantes : • Votre mot de passe devra expirer tous les 30 jours. • Le nombre minimum de jours avant de pouvoir modifier un mot de passe sera configuré à 2. • L’utilisateur devra recevoir un avertissement 7 jours avant que son mot de passe n’expire. • Votre mot de passe sera de 10 caractères minimums dont une majuscule et un chiffre, et ne devra pas comporter plus de 3 caractères identiques consécutifs.Le mot de passe ne devra pas comporter le nom de l’utilisateur. • La règle suivante ne s’applique pas à l’utilisateur root : le mot de passe devra comporter au moins 7 caractères qui ne sont pas présents dans l’ancien mot de passe. • Bien entendu votre mot de passe root devra suivre cette politique.Pour mettre en place une configuration stricte dans votre groupe sudo, il faudra remplir les conditions suivantes : • L’authentification en utilisant sudo sera limitée à 3 essais en cas de mot de passe erroné. • Un message de votre choix s’affichera en cas d’erreur suite à un mauvais mot de passe lors de l’utilisation de sudo. • Chaque action utilisant sudo sera archivée, aussi bien les inputs que les outputs. Le journal se trouvera dans le dossier /var/log/sudo/. • Le mode TTY sera activé pour des questions de sécurité. • Les paths utilisables par sudo seront restreints, là encore pour des questions de sécurité. Exemple : /usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/snap/bin
